@@ -3,11 +3,13 @@ import store from '@/store'
 import {getToken} from '@/utils/auth'
 import {ErrorMessage} from "@/shared/messages";
 
+const baseUrl = 'http://localhost:8000/api/v1';
+const timeout = 25000;
 // create an axios instance
 const request = axios.create({
-  baseURL: 'http://localhost:8000/api/v1',
+  baseURL: baseUrl,
   //withCredentials: true, // send cookies when cross-domain requests
-  timeout: 25000 // request timeout
+  timeout: timeout// request timeout
 });
 
 // request interceptor
@@ -16,9 +18,6 @@ request.interceptors.request.use(
     // do something before request is sent
 
     if (store.getters.token) {
-      // let each request carry token
-      // ['X-Token'] is a custom headers key
-      // please modify it according to the actual situation
       config.headers['Authentication'] = getToken()
     }
     return config
@@ -52,7 +51,7 @@ request.interceptors.response.use(
     }
     const status = error.response.status
     if (status >= 500) {
-      ErrorMessage('Serverda bir hata meydana geldi.');
+      ErrorMessage('Sunucuda bir hata meydana geldi.');
     } else if (status === 401) {
       ErrorMessage('Giriş hatası');
       await store.dispatch('user/resetToken').then(() => {
@@ -66,5 +65,11 @@ request.interceptors.response.use(
     return Promise.reject(error)
   }
 );
+
+export const requestUnauth = axios.create({
+  baseURL: baseUrl,
+  //withCredentials: true, // send cookies when cross-domain requests
+  timeout: timeout // request timeout
+});
 
 export default request

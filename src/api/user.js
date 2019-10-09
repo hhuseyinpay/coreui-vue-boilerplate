@@ -1,7 +1,7 @@
-import request from './request'
+import request, {requestUnauth} from './request'
 
 export function login(data) {
-  return request({
+  return requestUnauth({
     url: '/jwt/create',
     method: 'post',
     data
